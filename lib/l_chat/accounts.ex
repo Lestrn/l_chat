@@ -66,6 +66,17 @@ defmodule LChat.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user(id), do: Repo.get(User, id)
+
+  def get_user_with_preload(id) do
+    from(user in User,
+      where:  user.id == ^id,
+      preload: [:messages])
+    |> Repo.one()
+  end
+
+
+
   ## User registration
 
   @doc """
