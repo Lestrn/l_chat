@@ -6,6 +6,7 @@ config :l_chat, LChat.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "l_chat_dev",
+  port: 5431,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
