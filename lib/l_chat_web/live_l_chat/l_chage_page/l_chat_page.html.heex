@@ -1,7 +1,13 @@
-<header class="flex items-center justify-center">
+<h1 class="flex items-center justify-center">
   <p class="font-script font-medium italic text-5xl">Welcome to LChat!</p>
-</header>
-<section class="mt-[60px]">
+</h1>
+<section class="mt-[30px] flex flex-col h-[60vh] justify-between">
+  <div class="flex-1 overflow-auto p-4">
+    <p>Message</p>
+  </div>
+</section>
+
+<section class="mt-[30px]">
   <.form for={@message_form} phx-submit="save">
     <div class="relative">
       <.input field={@message_form[:context]} />
