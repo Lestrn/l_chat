@@ -23,14 +23,26 @@ defmodule LChat.Context.MessagesRepo do
   end
 
   def update_message(id, attrs) do
-    Repo.get(Message, id)
-    |> Message.changeset(attrs, %{validate_msg_ownership: Map.has_key?(attrs, :user_id)})
-    |> Repo.update()
+    with %Message{} = message <- Repo.get(Message, id) do
+      message
+      |> Message.changeset(attrs, %{validate_msg_ownership: Map.has_key?(attrs, :user_id)})
+      |> Repo.update()
+    else
+      nil -> {:error, "Message was not found"}
+    end
   end
 
   def create_message(attrs) do
     %Message{}
     |> Message.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def delete_message(id) do
+    with %Message{} = message <- Repo.get(Message, id) do
+      Repo.delete(message)
+    else
+      nil -> {:error, "Message was not found"}
+    end
   end
 end
