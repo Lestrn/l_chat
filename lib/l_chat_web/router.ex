@@ -18,9 +18,11 @@ defmodule LChatWeb.Router do
   end
 
   scope "/", LChatWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
-    get "/", PageController, :home
+    live_session(:authenticated, on_mount: {LChatWeb.UserAuth, :ensure_authenticated}) do
+      live "/", LChatPage
+     end
   end
 
   # Other scopes may use custom stacks.
