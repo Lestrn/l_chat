@@ -1,3 +1,17 @@
-<div class="flex items-center justify-center">
-    <p class="font-script font-medium italic text-5xl">Welcome to LChat!</p>
-</div>
+<header class="flex items-center justify-center">
+  <p class="font-script font-medium italic text-5xl">Welcome to LChat!</p>
+</header>
+<section class="mt-[60px]">
+  <.form for={@message_form} phx-submit="save">
+    <div class="relative">
+      <.input field={@message_form[:context]} />
+      <button class="absolute top-[5px] right-[14px]">
+        <FunctionComponents.icon
+          icon_name="send_icon"
+          svg_path={~p"/images/l_chat_sprite.svg#"}
+          icon_size="w-[32px] h-[32px]"
+        />
+      </button>
+    </div>
+  </.form>
+</section>

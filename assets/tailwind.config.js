@@ -9,7 +9,8 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/l_chat_web.ex",
-    "../lib/l_chat_web/**/*.*ex"
+    "../lib/l_chat_web/**/*.*ex",
+    "../lib/l_chat_web/**/*.heex"
   ],
   theme: {
     extend: {
