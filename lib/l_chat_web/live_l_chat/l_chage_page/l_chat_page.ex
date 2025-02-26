@@ -19,4 +19,8 @@ defmodule LChatWeb.LChatPage do
      |> assign(messages: MessagesRepo.get_messages_with_preload())
      |> assign(message_form: Message.changeset(%Message{}, %{}) |> to_form())}
   end
+
+  def handle_event("msg_is_being_typed", _unsigned_params, socket) do
+    {:noreply, socket}
+  end
 end

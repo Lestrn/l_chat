@@ -45,4 +45,8 @@ defmodule LChat.Context.MessagesRepo do
       nil -> {:error, "Message was not found"}
     end
   end
+
+  def clear_msgs() do
+    Repo.delete_all(Message)
+  end
 end

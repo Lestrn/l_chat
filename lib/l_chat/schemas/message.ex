@@ -8,7 +8,7 @@ defmodule LChat.Schemas.Message do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(message, attrs, opts \\ %{}) do
+  def changeset(message, attrs \\ %{}, opts \\ %{}) do
     message
     |> cast(attrs, [:content, :user_id])
     |> foreign_key_constraint(:user_id)
