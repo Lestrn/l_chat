@@ -3,14 +3,16 @@
 </h1>
 <section class="mt-[30px] flex flex-col h-[60vh] justify-between">
   <div class="flex-1 overflow-auto p-4">
-    <p>Message</p>
+    <div :for={message <- @messages}>
+        <p><%=message.content%></p>
+    </div>
   </div>
 </section>
 
 <section class="mt-[30px]">
   <.form for={@message_form} phx-submit="save">
     <div class="relative">
-      <.input field={@message_form[:context]} />
+      <.input field={@message_form[:content]} />
       <button class="absolute top-[5px] right-[14px]">
         <FunctionComponents.icon
           icon_name="send_icon"
