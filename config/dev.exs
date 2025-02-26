@@ -1,5 +1,6 @@
 import Config
 
+config :elixir, :consolidate_protocols, false
 # Configure your database
 config :l_chat, LChat.Repo,
   username: "postgres",

@@ -27,4 +27,10 @@ defmodule LChat.Context.MessagesRepo do
     |> Message.changeset(attrs, %{validate_msg_ownership: Map.has_key?(attrs, :user_id)})
     |> Repo.update()
   end
+
+  def create_message(attrs) do
+    %Message{}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
+  end
 end

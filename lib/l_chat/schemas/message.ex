@@ -14,7 +14,7 @@ defmodule LChat.Schemas.Message do
     |> foreign_key_constraint(:user_id)
     |> validate_required([:content, :user_id])
     |> validate_user_exists()
-    |> maybe_validate_message_ownership(Map.get(opts, :validate_msg_ownership), attrs)
+    |> maybe_validate_message_ownership(Map.get(opts, :validate_msg_ownership))
   end
 
   defp validate_user_exists(changeset) do
@@ -27,15 +27,15 @@ defmodule LChat.Schemas.Message do
     end
   end
 
-  defp maybe_validate_message_ownership(changeset, true, attrs) do
-    if attrs.user_id != get_field(changeset, :user_id) do
+  defp maybe_validate_message_ownership(changeset, true) do
+    if Map.has_key?(changeset.changes, :user_id) do
       add_error(changeset, :user_id, "Cant change ownership of user")
     else
       changeset
     end
   end
 
-  defp maybe_validate_message_ownership(changeset, _, _) do
+  defp maybe_validate_message_ownership(changeset, _) do
     changeset
   end
 end
