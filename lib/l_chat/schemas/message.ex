@@ -13,6 +13,7 @@ defmodule LChat.Schemas.Message do
     |> cast(attrs, [:content, :user_id])
     |> foreign_key_constraint(:user_id)
     |> validate_required([:content, :user_id])
+    |> validate_length(:content, max: 72)
     |> validate_user_exists()
     |> maybe_validate_message_ownership(Map.get(opts, :validate_msg_ownership))
   end

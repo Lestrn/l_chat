@@ -46,7 +46,10 @@ defmodule LChat.Accounts do
 
   def get_user_by_email_or_username_and_password(email_or_username, password)
       when is_binary(email_or_username) and is_binary(password) do
-    user = Repo.get_by(User, username: email_or_username) || Repo.get_by(User, email: email_or_username)
+    user =
+      Repo.get_by(User, username: email_or_username) ||
+        Repo.get_by(User, email: email_or_username)
+
     if User.valid_password?(user, password), do: user
   end
 
@@ -70,12 +73,11 @@ defmodule LChat.Accounts do
 
   def get_user_with_preload(id) do
     from(user in User,
-      where:  user.id == ^id,
-      preload: [:messages])
+      where: user.id == ^id,
+      preload: [:messages]
+    )
     |> Repo.one()
   end
-
-
 
   ## User registration
 
