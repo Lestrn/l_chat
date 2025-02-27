@@ -11,6 +11,14 @@ defmodule LChatWeb.LChatPage do
      |> assign(messages: MessagesRepo.get_messages_with_preload())}
   end
 
+  def handle_event("save", %{"message" => %{"content" => ""}}, socket) do
+    {:noreply,
+     socket
+     |> assign(
+       message_form: get_message_changeset(nil, socket.assigns.current_user.id) |> Map.put(:action, :validate) |> to_form()
+     )}
+  end
+
   def handle_event("save", %{"message" => %{"content" => content}}, socket) do
     MessagesRepo.create_message(%{content: content, user_id: socket.assigns.current_user.id})
 
@@ -18,7 +26,7 @@ defmodule LChatWeb.LChatPage do
      socket
      |> assign(messages: MessagesRepo.get_messages_with_preload())
      |> assign(
-       message_form: get_message_changeset("", socket.assigns.current_user.id) |> to_form()
+       message_form: get_message_changeset(nil, socket.assigns.current_user.id) |> to_form()
      )}
   end
 
