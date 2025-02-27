@@ -4,7 +4,7 @@
 <section class="mt-[30px] flex flex-col h-[60vh] justify-between">
   <div class="flex-1 overflow-auto p-4">
     <div :for={message <- @messages}>
-        <p><%=message.content%></p>
+      <p>{message.content}</p>
     </div>
   </div>
 </section>
@@ -13,7 +13,7 @@
   <.form for={@message_form} phx-submit="save" phx-change="msg_is_being_typed">
     <div class="relative">
       <.input field={@message_form[:content]} />
-      <button class="absolute top-[5px] right-[14px]">
+      <button type="submit" class="absolute top-[5px] right-[14px]">
         <FunctionComponents.icon
           icon_name="send_icon"
           svg_path={~p"/images/l_chat_sprite.svg#"}

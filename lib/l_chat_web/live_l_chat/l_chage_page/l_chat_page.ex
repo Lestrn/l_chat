@@ -17,10 +17,20 @@ defmodule LChatWeb.LChatPage do
     {:noreply,
      socket
      |> assign(messages: MessagesRepo.get_messages_with_preload())
-     |> assign(message_form: Message.changeset(%Message{}, %{}) |> to_form())}
+     |> assign(
+       message_form: get_message_changeset("", socket.assigns.current_user.id) |> to_form()
+     )}
   end
 
-  def handle_event("msg_is_being_typed", _unsigned_params, socket) do
-    {:noreply, socket}
+  def handle_event("msg_is_being_typed", %{"message" => %{"content" => content}}, socket) do
+    {:noreply,
+     socket
+     |> assign(
+       message_form: get_message_changeset(content, socket.assigns.current_user.id) |> to_form()
+     )}
+  end
+
+  defp get_message_changeset(content, user_id) do
+    %Message{} |> Message.changeset(%{content: content, user_id: user_id})
   end
 end
