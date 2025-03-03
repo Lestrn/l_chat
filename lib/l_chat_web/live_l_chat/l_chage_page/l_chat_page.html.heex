@@ -2,8 +2,8 @@
   <p class="font-script font-medium italic text-5xl">Welcome to LChat!</p>
 </h1>
 <section class="mt-[30px] flex flex-col h-[65vh] justify-between">
-  <div id="message_box" class="flex-1 overflow-y-auto p-4" phx-hook="AutoScroll">
-    <div :for={message <- Enum.reverse(@messages)}>
+  <div id="message_box" class="flex-1 overflow-y-auto p-4" phx-hook="AutoScroll" phx-update="stream">
+    <div :for={{message_id, message} <- @streams.messages} id={message_id}>
       <p class="break-words"><span><%=@current_user.username%>:</span> {message.content}</p>
     </div>
   </div>

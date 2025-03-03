@@ -2,6 +2,7 @@ defmodule LChat.Context.MessagesRepo do
   import Ecto.Query, warn: false
   alias LChat.Repo
   alias LChat.Schemas.Message
+  alias LChat.Accounts.User
 
   def get_message(id), do: Repo.get(Message, id)
 
@@ -9,6 +10,19 @@ defmodule LChat.Context.MessagesRepo do
     from(message in Message,
       where: message.id == ^id,
       preload: [:user]
+    )
+    |> Repo.one()
+  end
+
+  def get_last_msg_from_user(user_id) do
+    from(m in Message,
+      join: u in User,
+      on: m.user_id == u.id,
+      where: u.id == ^user_id,
+      order_by: [desc: m.inserted_at],
+      preload: [:user],
+      select: m,
+      limit: 1
     )
     |> Repo.one()
   end
@@ -21,7 +35,7 @@ defmodule LChat.Context.MessagesRepo do
   end
 
   def paginate_messages(query, current_page, per_page) do
-    offset = max(current_page - 1 * per_page, 0)
+    offset = max((current_page - 1) * per_page, 0)
 
     query
     |> limit(^per_page)
