@@ -3,7 +3,7 @@
 </h1>
 <section class="mt-[30px] flex flex-col h-[65vh] justify-between">
   <div class="flex-1 overflow-y-auto p-4">
-    <div :for={message <- @messages}>
+    <div :for={message <- Enum.reverse(@messages)}>
       <p class="break-words"><span><%=@current_user.username%>:</span> {message.content}</p>
     </div>
   </div>

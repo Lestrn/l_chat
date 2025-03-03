@@ -13,6 +13,27 @@ defmodule LChat.Context.MessagesRepo do
     |> Repo.one()
   end
 
+  def get_messages_with_preload(sort_by, current_page, per_page) do
+    from(message in Message, order_by: [{^sort_by, message.inserted_at}])
+    |> paginate_messages(current_page, per_page)
+    |> preload_user()
+    |> Repo.all()
+  end
+
+  def paginate_messages(query, current_page, per_page) do
+    offset = max(current_page - 1 * per_page, 0)
+
+    query
+    |> limit(^per_page)
+    |> offset(^offset)
+  end
+
+  def preload_user(query) do
+    from(message in query,
+      preload: [:user]
+    )
+  end
+
   def get_messages(), do: Repo.all(Message)
 
   def get_messages_with_preload() do

@@ -4,13 +4,14 @@ defmodule LChatWeb.LChatPage do
   alias LChatWeb.LChatComponents.FunctionComponents
   alias LChat.Context.MessagesRepo
 
+  @per_page 30
   def mount(_params, session, socket) do
     user = LChat.Accounts.get_user_by_session_token(session["user_token"])
 
     {:ok,
      socket
      |> assign(message_form: get_message_changeset(nil, user.id) |> to_form())
-     |> assign(messages: MessagesRepo.get_messages_with_preload())}
+     |> assign(messages: MessagesRepo.get_messages_with_preload(:desc, 1, @per_page))}
   end
 
   def handle_event("save", %{"message" => %{"content" => ""}}, socket) do
@@ -32,7 +33,7 @@ defmodule LChatWeb.LChatPage do
 
     {:noreply,
      socket
-     |> assign(messages: MessagesRepo.get_messages_with_preload())
+     |> assign(messages: MessagesRepo.get_messages_with_preload(:desc, 1, @per_page))
      |> assign(
        message_form: get_message_changeset(nil, socket.assigns.current_user.id) |> to_form()
      )}
