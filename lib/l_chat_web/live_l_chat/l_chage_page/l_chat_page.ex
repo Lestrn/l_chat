@@ -4,18 +4,28 @@ defmodule LChatWeb.LChatPage do
   alias LChatWeb.LChatComponents.FunctionComponents
   alias LChat.Context.MessagesRepo
 
-  @per_page 30
   def mount(_params, session, socket) do
     user = LChat.Accounts.get_user_by_session_token(session["user_token"])
 
     {:ok,
      socket
      |> assign(message_form: get_message_changeset(nil, user.id) |> to_form())
+     |> assign(total_pages_loaded: 1)
+     |> assign(per_page: 100)
+     |> stream(:messages, [])}
+  end
+
+  def handle_event("load_messages", %{"screen_height" => screen_height}, socket) do
+    per_page = (screen_height / 23) |> Float.round() |> trunc()
+
+    {:noreply,
+     socket
      |> stream(
        :messages,
-       MessagesRepo.get_messages_with_preload(:desc, 1, @per_page) |> Enum.reverse()
+       MessagesRepo.get_messages_with_preload(:desc, 1, per_page)
+       |> Enum.reverse()
      )
-     |> assign(total_pages_loaded: 1)
+     |> assign(per_page: per_page)
      |> push_event("scroll_down", %{})}
   end
 
@@ -31,17 +41,11 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_event("save", %{"message" => %{"content" => content}}, socket) do
-    MessagesRepo.create_message(%{
-      content: content,
-      user_id: socket.assigns.message_form.source.changes.user_id
-    })
+    message = create_message(content, socket.assigns.message_form.source.changes.user_id)
 
     {:noreply,
      socket
-     |> stream_insert(
-       :messages,
-       MessagesRepo.get_last_msg_from_user(socket.assigns.message_form.source.changes.user_id)
-     )
+     |> stream_insert(:messages, message)
      |> assign(
        message_form: get_message_changeset(nil, socket.assigns.current_user.id) |> to_form()
      )
@@ -64,7 +68,7 @@ defmodule LChatWeb.LChatPage do
       MessagesRepo.get_messages_with_preload(
         :desc,
         socket.assigns.total_pages_loaded + 1,
-        @per_page
+        socket.assigns.per_page
       )
       |> Enum.reverse()
 
@@ -74,8 +78,20 @@ defmodule LChatWeb.LChatPage do
          stream_insert(acc_socket, :messages, message, at: 0)
        end)
        |> update(:total_pages_loaded, fn tpl -> tpl + 1 end)}
-      else
-        {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp create_message(content, user_id) do
+    with {:ok, message} <-
+           MessagesRepo.create_message(%{
+             content: content,
+             user_id: user_id
+           }) do
+      message
+    else
+      _ -> nil
     end
   end
 

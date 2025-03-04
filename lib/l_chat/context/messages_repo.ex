@@ -68,9 +68,12 @@ defmodule LChat.Context.MessagesRepo do
   end
 
   def create_message(attrs) do
-    %Message{}
-    |> Message.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, message} <- Repo.insert(%Message{} |> Message.changeset(attrs)) do
+      {:ok, Repo.preload(message, [:user])}
+    else
+      {:error, changeset} -> {:error, changeset}
+      _ -> {:error, "Unexpected error"}
+    end
   end
 
   def delete_message(id) do
