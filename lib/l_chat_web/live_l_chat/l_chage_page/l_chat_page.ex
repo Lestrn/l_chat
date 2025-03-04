@@ -94,7 +94,7 @@ defmodule LChatWeb.LChatPage do
     {:noreply,
      socket
      |> stream_insert(:messages, message)
-     |> push_event("scroll_down", %{})}
+     |> push_event("scroll_down", %{current_user_owns_msg: socket.assigns.current_user.id == message.user.id})}
   end
 
   defp get_message_changeset(content, user_id) do

@@ -16,6 +16,11 @@ Hooks.AutoScroll = {
         this.initialScrollHeight = this.el.scrollHeight;
 
         this.handleEvent("scroll_down", (params) => { //if user doesnt read msgs above scroll down
+            if (params.current_user_owns_msg) {
+                this.el.scrollTop = this.el.scrollHeight;
+                return;
+            }
+
             if (this.scrollDown) {
                 this.el.scrollTop = this.el.scrollHeight;
             }
