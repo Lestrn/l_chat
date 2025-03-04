@@ -20,7 +20,7 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_event("load_messages", %{"screen_height" => screen_height}, socket) do
-    per_page = (screen_height / 23) |> Float.round() |> trunc()
+    per_page = (screen_height / 43) |> Float.round() |> trunc()
 
     {:noreply,
      socket
