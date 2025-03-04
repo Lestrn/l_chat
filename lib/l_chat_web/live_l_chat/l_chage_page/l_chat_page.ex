@@ -77,7 +77,6 @@ defmodule LChatWeb.LChatPage do
         socket.assigns.total_pages_loaded + 1,
         socket.assigns.per_page
       )
-      |> Enum.reverse()
 
     if loaded_msgs != [] do
       {:noreply,
