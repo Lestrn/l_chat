@@ -5,6 +5,10 @@ defmodule LChatWeb.LChatPage do
   alias LChat.Context.MessagesRepo
 
   def mount(_params, session, socket) do
+    if(connected?(socket)) do
+      MessagesRepo.subscribe()
+    end
+
     user = LChat.Accounts.get_user_by_session_token(session["user_token"])
 
     {:ok,
@@ -41,15 +45,18 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_event("save", %{"message" => %{"content" => content}}, socket) do
-    message = create_message(content, socket.assigns.message_form.source.changes.user_id)
+    MessagesRepo.create_message(%{
+      content: content,
+      user_id: socket.assigns.message_form.source.changes.user_id
+    })
 
     {:noreply,
      socket
-     |> stream_insert(:messages, message)
      |> assign(
-       message_form: get_message_changeset(nil, socket.assigns.current_user.id) |> to_form()
-     )
-     |> push_event("scroll_down", %{})}
+       message_form:
+         get_message_changeset(nil, socket.assigns.message_form.source.changes.user_id)
+         |> to_form()
+     )}
   end
 
   def handle_event("msg_is_being_typed", %{"message" => %{"content" => content}}, socket) do
@@ -83,16 +90,11 @@ defmodule LChatWeb.LChatPage do
     end
   end
 
-  defp create_message(content, user_id) do
-    with {:ok, message} <-
-           MessagesRepo.create_message(%{
-             content: content,
-             user_id: user_id
-           }) do
-      message
-    else
-      _ -> nil
-    end
+  def handle_info({:message_created, message}, socket) do
+    {:noreply,
+     socket
+     |> stream_insert(:messages, message)
+     |> push_event("scroll_down", %{})}
   end
 
   defp get_message_changeset(content, user_id) do

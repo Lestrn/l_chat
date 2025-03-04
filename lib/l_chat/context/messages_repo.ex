@@ -4,6 +4,15 @@ defmodule LChat.Context.MessagesRepo do
   alias LChat.Schemas.Message
   alias LChat.Accounts.User
 
+  def subscribe() do
+    Phoenix.PubSub.subscribe(LChat.PubSub, "lchat")
+  end
+
+  def broadcast({:ok, message}, tag) do
+    Phoenix.PubSub.broadcast(LChat.PubSub, "lchat", {tag, message})
+    {:ok, message}
+  end
+
   def get_message(id), do: Repo.get(Message, id)
 
   def get_message_with_preload(id) do
@@ -70,6 +79,7 @@ defmodule LChat.Context.MessagesRepo do
   def create_message(attrs) do
     with {:ok, message} <- Repo.insert(%Message{} |> Message.changeset(attrs)) do
       {:ok, Repo.preload(message, [:user])}
+      |> broadcast(:message_created)
     else
       {:error, changeset} -> {:error, changeset}
       _ -> {:error, "Unexpected error"}
