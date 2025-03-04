@@ -20,7 +20,10 @@ module.exports = {
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
         script: ['Dancing Script', 'cursive'],
-      }
+      },
+      fontWeight: {
+        light: 300,
+      },
     },
   },
   plugins: [
