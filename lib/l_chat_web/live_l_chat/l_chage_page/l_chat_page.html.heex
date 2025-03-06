@@ -23,13 +23,7 @@
     </div>
   </div>
 </section>
-<button type="submit" class="">
-  <FunctionComponents.icon
-    icon_name="arrow_down"
-    svg_path={~p"/images/l_chat_sprite.svg#"}
-    icon_size="w-[48px] h-[48px]"
-  />
-</button>
+
 <section class="mt-[30px]">
   <.form for={@message_form} phx-submit="save" phx-change="msg_is_being_typed">
     <div class="relative">
