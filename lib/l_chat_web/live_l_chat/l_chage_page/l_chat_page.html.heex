@@ -7,7 +7,7 @@
   <ul class="flex flex-col gap-4">
     <li
       :for={{_user_id, meta} <-@presences |> Enum.sort(fn {_id1, meta1}, {_id2, meta2} -> meta1.is_typing > meta2.is_typing end)}
-      class="flex items-center gap-4 p-4 py-[200px] border-2 border-gray-300 rounded-lg shadow-md transition duration-300 hover:shadow-xl hover:border-gray-400"
+      class="flex items-center gap-4 p-4 border-2 border-gray-300 rounded-lg shadow-md transition duration-300 hover:shadow-xl hover:border-gray-400"
     >
       <!-- Avatar -->
       <div
