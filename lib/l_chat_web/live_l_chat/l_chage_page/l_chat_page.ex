@@ -3,19 +3,27 @@ defmodule LChatWeb.LChatPage do
   alias LChat.Schemas.Message
   alias LChatWeb.LChatComponents.FunctionComponents
   alias LChat.Context.MessagesRepo
+  alias LChatWeb.Presence
 
   def mount(_params, session, socket) do
+    user = LChat.Accounts.get_user_by_session_token(session["user_token"])
+
     if(connected?(socket)) do
       MessagesRepo.subscribe()
-    end
 
-    user = LChat.Accounts.get_user_by_session_token(session["user_token"])
+      {:ok, _} =
+        Presence.track(self(), MessagesRepo.get_pubsub_topc(), user.id, %{
+          username: user.username,
+          is_typing: false
+        })
+    end
 
     {:ok,
      socket
      |> assign(message_form: get_message_changeset(nil, user.id) |> to_form())
      |> assign(total_pages_loaded: 1)
      |> assign(per_page: 100)
+     |> assign(presences: Presence.list(MessagesRepo.get_pubsub_topc()) |> simple_presence_map())
      |> stream(:messages, [])}
   end
 
@@ -93,10 +101,38 @@ defmodule LChatWeb.LChatPage do
     {:noreply,
      socket
      |> stream_insert(:messages, message)
-     |> push_event("scroll_down", %{current_user_owns_msg: socket.assigns.current_user.id == message.user.id})}
+     |> push_event("scroll_down", %{
+       current_user_owns_msg: socket.assigns.current_user.id == message.user.id
+     })}
+  end
+
+  def handle_info(%{event: "presence_diff", payload: diff}, socket) do
+    socket
+    |> remove_presences(diff.leaves)
+    |> add_presences(diff.joins)
+
+    {:noreply, socket}
   end
 
   defp get_message_changeset(content, user_id) do
     %Message{} |> Message.changeset(%{content: content, user_id: user_id})
+  end
+
+  defp simple_presence_map(presences) do
+    Enum.into(presences, %{}, fn {user_id, %{metas: [meta | _]}} -> {user_id, meta} end)
+  end
+
+  defp add_presences(socket, joins) do
+    simple_presence_map(joins)
+    |> Enum.reduce(socket, fn {user_id, meta}, socket ->
+      update(socket, :presences, &Map.put(&1, user_id, meta))
+    end)
+  end
+
+  defp remove_presences(socket, leaves) do
+    simple_presence_map(leaves)
+    |> Enum.reduce(socket, fn {user_id, _}, socket ->
+      update(socket, :presences, &Map.delete(&1, user_id))
+    end)
   end
 end

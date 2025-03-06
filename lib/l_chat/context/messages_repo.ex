@@ -4,12 +4,13 @@ defmodule LChat.Context.MessagesRepo do
   alias LChat.Schemas.Message
   alias LChat.Accounts.User
 
+  def get_pubsub_topc(), do: "lchat"
   def subscribe() do
-    Phoenix.PubSub.subscribe(LChat.PubSub, "lchat")
+    Phoenix.PubSub.subscribe(LChat.PubSub, get_pubsub_topc())
   end
 
   def broadcast({:ok, message}, tag) do
-    Phoenix.PubSub.broadcast(LChat.PubSub, "lchat", {tag, message})
+    Phoenix.PubSub.broadcast(LChat.PubSub, get_pubsub_topc(), {tag, message})
     {:ok, message}
   end
 
