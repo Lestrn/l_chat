@@ -119,11 +119,10 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_info(%{event: "presence_diff", payload: diff}, socket) do
-    socket
-    |> remove_presences(diff.leaves)
-    |> add_presences(diff.joins)
-
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> remove_presences(diff.leaves)
+     |> add_presences(diff.joins)}
   end
 
   defp get_message_changeset(content, user_id) do
