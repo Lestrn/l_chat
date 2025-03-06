@@ -53,26 +53,38 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_event("save", %{"message" => %{"content" => content}}, socket) do
+    current_user_id = socket.assigns.message_form.source.changes.user_id
+
     MessagesRepo.create_message(%{
       content: content,
-      user_id: socket.assigns.message_form.source.changes.user_id
+      user_id: current_user_id
     })
+
+    change_meta_if_user_is_typing(current_user_id, false)
 
     {:noreply,
      socket
      |> assign(
        message_form:
-         get_message_changeset(nil, socket.assigns.message_form.source.changes.user_id)
+         get_message_changeset(nil, current_user_id)
          |> to_form()
      )}
   end
 
   def handle_event("msg_is_being_typed", %{"message" => %{"content" => content}}, socket) do
+    current_user_id = socket.assigns.message_form.source.changes.user_id
+
+    if content == "" do
+      change_meta_if_user_is_typing(current_user_id, false)
+    else
+      change_meta_if_user_is_typing(current_user_id, true)
+    end
+
     {:noreply,
      socket
      |> assign(
        message_form:
-         get_message_changeset(content, socket.assigns.message_form.source.changes.user_id)
+         get_message_changeset(content, current_user_id)
          |> Map.put(:action, :validate)
          |> to_form()
      )}
@@ -134,5 +146,13 @@ defmodule LChatWeb.LChatPage do
     |> Enum.reduce(socket, fn {user_id, _}, socket ->
       update(socket, :presences, &Map.delete(&1, user_id))
     end)
+  end
+
+  defp change_meta_if_user_is_typing(current_user_id, is_typing) do
+    %{metas: [meta | _]} = Presence.get_by_key(MessagesRepo.get_pubsub_topc(), current_user_id)
+
+    new_meta = %{meta | is_typing: is_typing}
+
+    Presence.update(self(), MessagesRepo.get_pubsub_topc(), current_user_id, new_meta)
   end
 end
