@@ -129,7 +129,7 @@ defmodule LChatWeb.LChatPage do
   def handle_event("close_edit_msg_modal", _, socket) do
     {:noreply,
      socket
-     |> assign(edit_msg_form: nil)
+
      |> assign(show_edit_msg_modal: false)}
   end
 
@@ -157,7 +157,6 @@ defmodule LChatWeb.LChatPage do
       {:noreply,
        socket
        |> put_flash(:info, "Msg was updated")
-       |> assign(edit_msg_form: nil)
        |> assign(show_edit_msg_modal: false)}
     else
       _ ->

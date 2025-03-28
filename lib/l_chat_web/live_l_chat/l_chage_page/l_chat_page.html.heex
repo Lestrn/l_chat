@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    <div class="mt-[30px]">
+    <div :if={!@show_edit_msg_modal} class="mt-[30px]">
       <.form for={@message_form} phx-submit="save" phx-change="msg_is_being_typed">
         <div class="relative">
           <.input field={@message_form[:content]} />
