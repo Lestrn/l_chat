@@ -9,13 +9,31 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/l_chat_web.ex",
-    "../lib/l_chat_web/**/*.*ex"
+    "../lib/l_chat_web/**/*.*ex",
+    "../lib/l_chat_web/**/*.heex"
   ],
   theme: {
     extend: {
       colors: {
         brand: "#FD4F00",
-      }
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        script: ['Dancing Script', 'cursive'],
+      },
+      fontWeight: {
+        light: 300,
+      },
+      keyframes: {
+        typing: {
+          '0%': { opacity: '0' },
+          '50%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+      },
+      animation: {
+        typing: 'typing 1.5s infinite ease-in-out',
+      },
     },
   },
   plugins: [

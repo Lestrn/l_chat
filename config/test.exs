@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -10,6 +13,7 @@ config :l_chat, LChat.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "l_chat_test#{System.get_env("MIX_TEST_PARTITION")}",
+  port: 5431,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

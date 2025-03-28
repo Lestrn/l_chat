@@ -12,6 +12,7 @@ defmodule LChat.Application do
       LChat.Repo,
       {DNSCluster, query: Application.get_env(:l_chat, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LChat.PubSub},
+      LChatWeb.Presence,
       # Start the Finch HTTP client for sending emails
       {Finch, name: LChat.Finch},
       # Start a worker by calling: LChat.Worker.start_link(arg)
