@@ -156,7 +156,7 @@ defmodule LChatWeb.LChatPage do
            }) do
       {:noreply,
        socket
-       |> put_flash(:info, "Msg was updated")
+       |> put_flash(:info, "Message was updated")
        |> assign(show_edit_msg_modal: false)}
     else
       _ ->
