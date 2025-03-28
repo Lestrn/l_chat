@@ -87,9 +87,10 @@ defmodule LChat.Context.MessagesRepo do
     end
   end
 
-  def delete_message(id) do
+  def delete_message!(id) do
     with %Message{} = message <- Repo.get(Message, id) do
       Repo.delete(message)
+      |> broadcast(:message_deleted)
     else
       nil -> {:error, "Message was not found"}
     end

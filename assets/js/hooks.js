@@ -41,17 +41,24 @@ Hooks.AutoScroll = {
 Hooks.ContextMenuHook = {
     mounted() {
         let contextMenu = document.getElementById("context-menu");
+        let currentUserId = this.el.dataset.currentUserId;
+        let messageUserId = this.el.dataset.messageUserId;
 
         this.el.addEventListener("contextmenu", async (event) => {
             event.preventDefault();
             let messageId = this.el.id;
-            try {
-                await this.pushEvent("set_msg_id_for_context", { "message-id": messageId.replace(/\D/g, "") });
-                contextMenu.style.top = `${event.clientY}px`;
-                contextMenu.style.left = `${event.clientX}px`;
-                contextMenu.classList.remove("hidden");
-            } catch (error) {
-                console.error("Error sending event:", error);
+            if (currentUserId === messageUserId) {
+                try {
+                    await this.pushEvent("set_msg_id_for_context", { "message-id": messageId.replace(/\D/g, "") });
+                    contextMenu.style.top = `${event.clientY}px`;
+                    contextMenu.style.left = `${event.clientX}px`;
+                    contextMenu.classList.remove("hidden");
+                } catch (error) {
+                    console.error("Error sending event:", error);
+                }
+            }
+            else {
+                contextMenu.classList.add("hidden");
             }
         });
 

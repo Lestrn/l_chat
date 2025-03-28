@@ -119,8 +119,11 @@ defmodule LChatWeb.LChatPage do
   end
 
   def handle_event("delete_message", %{"message-id" => message_id}, socket) do
-    IO.puts("Deleting message: #{message_id}")
-    {:noreply, socket}
+    with {:ok, _} <- MessagesRepo.delete_message!(message_id) do
+      {:noreply, socket |> put_flash(:info, "Message was deleted")}
+    else
+      _ -> {:noreply, socket |> put_flash(:error, "Something went wrong deleting the msg")}
+    end
   end
 
   def handle_info({:message_created, message}, socket) do
@@ -130,6 +133,12 @@ defmodule LChatWeb.LChatPage do
      |> push_event("scroll_down", %{
        current_user_owns_msg: socket.assigns.current_user.id == message.user.id
      })}
+  end
+
+  def handle_info({:message_deleted, message}, socket) do
+    {:noreply,
+     socket
+     |> stream_delete(:messages, message)}
   end
 
   def handle_info(%{event: "presence_diff", payload: diff}, socket) do
