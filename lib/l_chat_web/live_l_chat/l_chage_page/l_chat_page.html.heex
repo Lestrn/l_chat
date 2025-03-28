@@ -37,7 +37,11 @@
       phx-hook="AutoScroll"
       phx-update="stream"
     >
-      <div :for={{message_id, message} <- @streams.messages} id={message_id}>
+      <div
+        :for={{message_id, message} <- @streams.messages}
+        id={message_id}
+        phx-hook="ContextMenuHook"
+      >
         <div class={"flex #{@current_user.id == message.user.id && "justify-end"}"}>
           <div class="w-[45%] my-[15px]">
             <p class="font-medium p-[5px]">{message.user.username}</p>
@@ -55,16 +59,20 @@
       <.form for={@message_form} phx-submit="save" phx-change="msg_is_being_typed">
         <div class="relative">
           <.input field={@message_form[:content]} />
-          <button type="submit" class="absolute top-[5px] right-[14px]">
-            <FunctionComponents.icon
-              icon_name="send_icon"
-              svg_path={~p"/images/l_chat_sprite.svg#"}
-              icon_size="w-[32px] h-[32px]"
-            />
-          </button>
         </div>
       </.form>
     </div>
   </section>
+  <div id="context-menu" class="hidden absolute bg-white shadow-md p-2 rounded-md">
+    <button phx-click="edit_message" phx-value-message-id={@message_id} class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+      ✏️ Edit Message
+    </button>
+    <button
+      phx-click="delete_message"
+      phx-value-message-id={@message_id}
+      class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+    >
+      🗑 Delete Message
+    </button>
+  </div>
 </div>
-

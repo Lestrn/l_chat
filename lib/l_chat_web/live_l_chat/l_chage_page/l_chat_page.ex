@@ -1,7 +1,6 @@
 defmodule LChatWeb.LChatPage do
   use LChatWeb, :live_view
   alias LChat.Schemas.Message
-  alias LChatWeb.LChatComponents.FunctionComponents
   alias LChat.Context.MessagesRepo
   alias LChatWeb.Presence
 
@@ -24,6 +23,7 @@ defmodule LChatWeb.LChatPage do
      |> assign(total_pages_loaded: 1)
      |> assign(per_page: 100)
      |> assign(presences: Presence.list(MessagesRepo.get_pubsub_topc()) |> simple_presence_map())
+     |> assign(message_id: nil)
      |> stream(:messages, [])}
   end
 
@@ -107,6 +107,20 @@ defmodule LChatWeb.LChatPage do
     else
       {:noreply, socket}
     end
+  end
+
+  def handle_event("set_msg_id_for_context", %{"message-id" => message_id}, socket) do
+    {:noreply, socket |> assign(message_id: message_id)}
+  end
+
+  def handle_event("edit_message", %{"message-id" => message_id}, socket) do
+    IO.puts("Editing message: #{message_id}")
+    {:noreply, socket}
+  end
+
+  def handle_event("delete_message", %{"message-id" => message_id}, socket) do
+    IO.puts("Deleting message: #{message_id}")
+    {:noreply, socket}
   end
 
   def handle_info({:message_created, message}, socket) do

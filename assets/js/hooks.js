@@ -25,7 +25,6 @@ Hooks.AutoScroll = {
                 this.el.scrollTop = this.el.scrollHeight;
             }
         });
-
     },
     updated() {
         const element = this.el; //Save position of scroll on loading new msgs
@@ -38,4 +37,28 @@ Hooks.AutoScroll = {
         }
     }
 };
+
+Hooks.ContextMenuHook = {
+    mounted() {
+        let contextMenu = document.getElementById("context-menu");
+
+        this.el.addEventListener("contextmenu", async (event) => {
+            event.preventDefault();
+            let messageId = this.el.id;
+            try {
+                await this.pushEvent("set_msg_id_for_context", { "message-id": messageId.replace(/\D/g, "") });
+                contextMenu.style.top = `${event.clientY}px`;
+                contextMenu.style.left = `${event.clientX}px`;
+                contextMenu.classList.remove("hidden");
+            } catch (error) {
+                console.error("Error sending event:", error);
+            }
+        });
+
+        document.addEventListener("click", () => {
+            contextMenu.classList.add("hidden");
+        });
+    }
+}
+
 export default Hooks;
