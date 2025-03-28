@@ -5,6 +5,7 @@ defmodule LChat.Context.MessagesRepo do
   alias LChat.Accounts.User
 
   def get_pubsub_topc(), do: "lchat"
+
   def subscribe() do
     Phoenix.PubSub.subscribe(LChat.PubSub, get_pubsub_topc())
   end
@@ -69,9 +70,15 @@ defmodule LChat.Context.MessagesRepo do
 
   def update_message(id, attrs) do
     with %Message{} = message <- Repo.get(Message, id) do
-      message
-      |> Message.changeset(attrs, %{validate_msg_ownership: Map.has_key?(attrs, :user_id)})
-      |> Repo.update()
+      with {:ok, message} <-
+             message
+             |> Message.changeset(attrs, %{validate_msg_ownership: Map.has_key?(attrs, :user_id)})
+             |> Repo.update() do
+        {:ok, Repo.preload(message, [:user])}
+        |> broadcast(:message_updated)
+      else
+        {:error, changeset} -> {:error, changeset}
+      end
     else
       nil -> {:error, "Message was not found"}
     end

@@ -20,10 +20,12 @@ defmodule LChatWeb.LChatPage do
     {:ok,
      socket
      |> assign(message_form: get_message_changeset(nil, user.id) |> to_form())
+     |> assign(edit_msg_form: nil)
      |> assign(total_pages_loaded: 1)
      |> assign(per_page: 100)
      |> assign(presences: Presence.list(MessagesRepo.get_pubsub_topc()) |> simple_presence_map())
      |> assign(message_id: nil)
+     |> assign(show_edit_msg_modal: false)
      |> stream(:messages, [])}
   end
 
@@ -113,9 +115,61 @@ defmodule LChatWeb.LChatPage do
     {:noreply, socket |> assign(message_id: message_id)}
   end
 
-  def handle_event("edit_message", %{"message-id" => message_id}, socket) do
-    IO.puts("Editing message: #{message_id}")
-    {:noreply, socket}
+  def handle_event("open_modal_edit_msg", %{"message-id" => message_id}, socket) do
+    with %Message{} = message <- MessagesRepo.get_message(message_id) do
+      {:noreply,
+       socket
+       |> assign(edit_msg_form: Message.changeset(message) |> to_form())
+       |> assign(show_edit_msg_modal: true)}
+    else
+      _ -> {:noreply, socket |> put_flash(:error, "Message was not found")}
+    end
+  end
+
+  def handle_event("close_edit_msg_modal", _, socket) do
+    {:noreply,
+     socket
+     |> assign(edit_msg_form: nil)
+     |> assign(show_edit_msg_modal: false)}
+  end
+
+  def handle_event("validate_edit_msg", %{"message" => %{"content" => content}}, socket) do
+    current_user_id = socket.assigns.message_form.source.changes.user_id
+
+    {:noreply,
+     socket
+     |> assign(
+       edit_msg_form:
+         get_message_changeset(content, current_user_id)
+         |> Map.put(:action, :validate)
+         |> to_form()
+     )}
+  end
+
+  def handle_event("save_edit_msg", %{"message" => %{"content" => content}}, socket) do
+    current_user_id = socket.assigns.current_user.id
+
+    with {:ok, _message} <-
+           MessagesRepo.update_message(socket.assigns.message_id, %{
+             content: content,
+             user_id: current_user_id
+           }) do
+      {:noreply,
+       socket
+       |> put_flash(:info, "Msg was updated")
+       |> assign(edit_msg_form: nil)
+       |> assign(show_edit_msg_modal: false)}
+    else
+      _ ->
+        {:noreply,
+         socket
+         |> assign(
+           edit_msg_form:
+             get_message_changeset(content, current_user_id)
+             |> Map.put(:action, :validate)
+             |> to_form()
+         )}
+    end
   end
 
   def handle_event("delete_message", %{"message-id" => message_id}, socket) do
@@ -139,6 +193,12 @@ defmodule LChatWeb.LChatPage do
     {:noreply,
      socket
      |> stream_delete(:messages, message)}
+  end
+
+  def handle_info({:message_updated, message}, socket) do
+    {:noreply,
+     socket
+     |> stream_insert(:messages, message)}
   end
 
   def handle_info(%{event: "presence_diff", payload: diff}, socket) do
