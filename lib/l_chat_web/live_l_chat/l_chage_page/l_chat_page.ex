@@ -3,6 +3,7 @@ defmodule LChatWeb.LChatPage do
   alias LChat.Schemas.Message
   alias LChat.Context.MessagesRepo
   alias LChatWeb.Presence
+  import LChatWeb.LChatComponents.FunctionComponents
 
   def mount(_params, session, socket) do
     user = LChat.Accounts.get_user_by_session_token(session["user_token"])
