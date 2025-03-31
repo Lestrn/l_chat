@@ -81,4 +81,31 @@ defmodule LChatWeb.LChatComponents.FunctionComponents do
     </li>
     """
   end
+
+  attr :current_user, :map, required: true
+  attr :message, :map, required: true
+  attr :message_id, :integer, required: true
+
+  def message(assigns) do
+    ~H"""
+    <div
+      id={@message_id}
+      phx-hook="ContextMenuHook"
+      data-current-user-id={@current_user.id}
+      data-message-user-id={@message.user.id}
+    >
+      <div class={"flex #{@current_user.id == @message.user.id && "justify-end"}"}>
+        <div class="w-[45%] my-[15px]">
+          <p class="font-medium p-[5px]">{@message.user.username}</p>
+          <p class="break-words font-light p-[10px] bg-[#F2F7FB] ml-[20px] rounded-tr-xl rounded-br-xl rounded-bl-xl">
+            {@message.content}
+          </p>
+          <p class="text-gray-400 text-xs float-right">
+            {Timex.format!(@message.inserted_at, "%b %d, %Y, %H:%M:%S", :strftime)}
+          </p>
+        </div>
+      </div>
+    </div>
+    """
+  end
 end

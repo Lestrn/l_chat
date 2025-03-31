@@ -2,7 +2,7 @@
   <p class="font-script font-medium italic text-5xl">Welcome to LChat!</p>
 </h1>
 <div class="flex mt-[40px] h-[75vh] mx-auto max-w-5xl">
-  <.users_section presences={@presences}/>
+  <.users_section presences={@presences} />
   <section class="mt-[30px] flex flex-col w-[75%] justify-between shadow-lg rounded-lg">
     <div
       id="message_box"
@@ -10,25 +10,12 @@
       phx-hook="AutoScroll"
       phx-update="stream"
     >
-      <div
+      <.message
         :for={{message_id, message} <- @streams.messages}
-        id={message_id}
-        phx-hook="ContextMenuHook"
-        data-current-user-id={@current_user.id}
-        data-message-user-id={message.user.id}
-      >
-        <div class={"flex #{@current_user.id == message.user.id && "justify-end"}"}>
-          <div class="w-[45%] my-[15px]">
-            <p class="font-medium p-[5px]">{message.user.username}</p>
-            <p class="break-words font-light p-[10px] bg-[#F2F7FB] ml-[20px] rounded-tr-xl rounded-br-xl rounded-bl-xl">
-              {message.content}
-            </p>
-            <p class="text-gray-400 text-xs float-right">
-              {Timex.format!(message.inserted_at, "%b %d, %Y, %H:%M:%S", :strftime)}
-            </p>
-          </div>
-        </div>
-      </div>
+        message_id={message_id}
+        message={message}
+        current_user={@current_user}
+      />
     </div>
     <div :if={!@show_edit_msg_modal} class="mt-[30px]">
       <.form for={@message_form} phx-submit="save" phx-change="msg_is_being_typed">
@@ -38,20 +25,24 @@
       </.form>
     </div>
   </section>
-  <.context_menu id="context-menu" class="hidden absolute bg-white shadow-md p-2 rounded-md"  message_id={@message_id}/>
-  <.modal
-    :if={@show_edit_msg_modal}
-    id="edit_msg_modal"
-    show={true}
-    on_cancel={JS.push("close_edit_msg_modal")}
-  >
-    <.form
-      id="edit_msg_form"
-      for={@edit_msg_form}
-      phx-submit="save_edit_msg"
-      phx-change="validate_edit_msg"
-    >
-      <.input field={@edit_msg_form[:content]} label="Edit message:" />
-    </.form>
-  </.modal>
 </div>
+<.context_menu
+  id="context-menu"
+  class="hidden absolute bg-white shadow-md p-2 rounded-md"
+  message_id={@message_id}
+/>
+<.modal
+  :if={@show_edit_msg_modal}
+  id="edit_msg_modal"
+  show={true}
+  on_cancel={JS.push("close_edit_msg_modal")}
+>
+  <.form
+    id="edit_msg_form"
+    for={@edit_msg_form}
+    phx-submit="save_edit_msg"
+    phx-change="validate_edit_msg"
+  >
+    <.input field={@edit_msg_form[:content]} label="Edit message:" />
+  </.form>
+</.modal>
