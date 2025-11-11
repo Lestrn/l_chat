@@ -22,7 +22,7 @@ defmodule LChatWeb.Router do
 
     live_session(:authenticated, on_mount: {LChatWeb.UserAuth, :ensure_authenticated}) do
       live "/", LChatPage
-     end
+    end
   end
 
   # Other scopes may use custom stacks.
