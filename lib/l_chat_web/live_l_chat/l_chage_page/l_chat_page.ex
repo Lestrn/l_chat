@@ -130,7 +130,6 @@ defmodule LChatWeb.LChatPage do
   def handle_event("close_edit_msg_modal", _, socket) do
     {:noreply,
      socket
-
      |> assign(show_edit_msg_modal: false)}
   end
 

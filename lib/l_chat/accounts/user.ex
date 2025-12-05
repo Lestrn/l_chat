@@ -148,7 +148,7 @@ defmodule LChat.Accounts.User do
   """
   def valid_password?(%LChat.Accounts.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
-        Pbkdf2.verify_pass(password, hashed_password)
+    Pbkdf2.verify_pass(password, hashed_password)
   end
 
   def valid_password?(_, _) do
