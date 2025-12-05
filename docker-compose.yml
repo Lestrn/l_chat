@@ -8,4 +8,9 @@ services:
       - POSTGRES_DB=l_chat_dev
     ports:
       - "5431:5432"
+    volumes:
+      - postgres_l_chat_data:/var/lib/postgresql
     restart: unless-stopped
+
+volumes:
+  postgres_l_chat_data:
